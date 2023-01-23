@@ -1,5 +1,13 @@
 console.log('Dynamic List');
 
+const LIST_INDENT = 40;
+const LIST_SUB_INDENT = 20;
+const ANIMATE_OPTION = {
+  duration: 300,
+  easing: 'ease',
+  fill: 'forwards',
+};
+
 // utility function
 const sumParentScrollOffset = (el) => {
   if (!el) return [0, 0];
@@ -10,26 +18,16 @@ const sumParentScrollOffset = (el) => {
 // test data
 const SAMPLE_DATA = Array(100)
   .fill('')
-  .map((_, index) => {
-    const div = document.createElement('div');
-    div.style.width = '200px';
-    div.style.height = '36px';
-    div.style.backgroundColor = '#C7F9CC';
-    div.style.border = '1px solid #70EB8D';
-    div.style.padding = '4px 8px';
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.innerHTML = index + 1;
-
-    return div;
-  });
+  .map((_, index) => `${index + 1}`);
 
 const targetEl = document.querySelector('#dynamic-list-area');
 const dynamicList = DynamicList({
-  items: SAMPLE_DATA,
+  list: SAMPLE_DATA,
   gap: 8,
-  minWidth: '260px',
-  maxHeight: '1600px',
+  itemWidth: '200px',
+  itemHeight: '36px',
+  popWidth: '500px',
+  popHeight: '360px',
 });
 targetEl.appendChild(dynamicList);
 
@@ -37,10 +35,10 @@ targetEl.appendChild(dynamicList);
 // TODO: 설명
 // TODO: props를 변경할때마다 DOM을 새로 생성하고있다. DOM을 유지하고 state에 따라 업데이트되는 방식으로 수정 해보자.
 function DynamicList({
-  items,
-  gap,
-  minWidth,
-  maxHeight,
+  list = [],
+  gap = 8,
+  itemWidth = '200px',
+  itemHeight,
   popWidth = '500px',
   popHeight = '360px',
 }) {
@@ -51,116 +49,60 @@ function DynamicList({
 
   const ul = document.createElement('ul');
   ul.className = 'dynamic-list';
-  ul.style.minWidth = minWidth;
-  ul.style.maxHeight = maxHeight;
-  ul.style.overflow = 'auto';
 
-  const wrappedItems = items.map((item, index) => {
+  const items = list.map((item, index) => {
     const li = document.createElement('li');
     li.className = 'item';
-    li.style.width = 'fit-content'; // TODO: 애니메이션 적용을 위해 수치값으로 적용 필요
-    li.style.height = 'fit-content'; // TODO: 애니메이션 적용을 위해 수치값으로 적용 필요
+    li.style.border = '1px solid black';
+    li.style.width = itemWidth;
+    li.style.height = itemHeight;
     li.style.marginTop = `${index > 0 ? gap : 0}px`;
-    if (typeof item === 'object') {
-      li.appendChild(item);
-    } else {
-      // TODO: 일반 텍스트 처리
-      li.innerText = item;
-    }
+    li.style.padding = '4px 8px';
+    li.style.display = 'flex';
+    li.style.alignItems = 'center';
+
+    li.innerText = item;
 
     return li;
   });
 
-  wrappedItems.forEach((item) => {
+  items.forEach((item) => {
     ul.appendChild(item);
   });
 
   // TODO: mouseenter <-> mouseover 차이 확인
   const createMouseEnterHandler = (targetIndex, items) => () => {
-    // items[targetIndex].classList.add('hover-item');
-    // if (targetIndex > 0) {
-    //   items[targetIndex - 1].classList.add('neighbor-item');
-    // }
-    // if (targetIndex < items.length - 1) {
-    //   items[targetIndex + 1].classList.add('neighbor-item');
-    // }
-
     items[targetIndex].animate(
-      { marginLeft: '40px' },
-      {
-        duration: 300,
-        easing: 'ease',
-        fill: 'forwards',
-      }
+      { marginLeft: `${LIST_INDENT}px` },
+      ANIMATE_OPTION
     );
     if (targetIndex > 0) {
       items[targetIndex - 1].animate(
-        { marginLeft: '20px' },
-        {
-          duration: 300,
-          easing: 'ease',
-          fill: 'forwards',
-        }
+        { marginLeft: `${LIST_SUB_INDENT}px` },
+        ANIMATE_OPTION
       );
     }
     if (targetIndex < items.length - 1) {
       items[targetIndex + 1].animate(
-        { marginLeft: '20px' },
-        {
-          duration: 300,
-          easing: 'ease',
-          fill: 'forwards',
-        }
+        { marginLeft: `${LIST_SUB_INDENT}px` },
+        ANIMATE_OPTION
       );
     }
   };
 
   // TODO: mouseleave <-> mouseout 차이 확인
   const createMouseLeaveHandler = (targetIndex, items) => () => {
-    // items[targetIndex].classList.remove('hover-item');
-    // if (targetIndex > 0) {
-    //   items[targetIndex - 1].classList.remove('neighbor-item');
-    // }
-    // if (targetIndex < items.length - 1) {
-    //   items[targetIndex + 1].classList.remove('neighbor-item');
-    // }
-
-    items[targetIndex].animate(
-      { marginLeft: '0px' },
-      {
-        duration: 300,
-        easing: 'ease',
-        fill: 'forwards',
-      }
-    );
+    items[targetIndex].animate({ marginLeft: 0 }, ANIMATE_OPTION);
     if (targetIndex > 0) {
-      items[targetIndex - 1].animate(
-        { marginLeft: '0px' },
-        {
-          duration: 300,
-          easing: 'ease',
-          fill: 'forwards',
-        }
-      );
+      items[targetIndex - 1].animate({ marginLeft: 0 }, ANIMATE_OPTION);
     }
     if (targetIndex < items.length - 1) {
-      items[targetIndex + 1].animate(
-        { marginLeft: '0px' },
-        {
-          duration: 300,
-          easing: 'ease',
-          fill: 'forwards',
-        }
-      );
+      items[targetIndex + 1].animate({ marginLeft: 0 }, ANIMATE_OPTION);
     }
   };
 
   const replaceTransparentItem = (item) => {
-    const transparentItem = document.createElement('li');
-    transparentItem.className = item.className;
-    transparentItem.style.width = item.style.width;
-    transparentItem.style.marginTop = item.style.marginTop;
-    transparentItem.innerHTML = item.innerHTML;
+    const transparentItem = item.cloneNode(true);
     transparentItem.style.opacity = 0;
     ul.insertBefore(transparentItem, item);
   };
@@ -181,19 +123,9 @@ function DynamicList({
       item.classList.add('selected');
       item.style.position = 'fixed';
       item.style.margin = '0';
-
-      // start position
-      item.style.left = `${startOffsetX}px`;
-      item.style.top = `${startOffsetY}px`;
-
-      // final position
-      // item.style.left = '50%';
-      // item.style.top = '50%';
-      // item.style.transform = 'translate(-50%, -50%)';
-
+      item.style.left = `${startOffsetX}px`; // original position
+      item.style.top = `${startOffsetY}px`; // original position
       item.style.zIndex = 1;
-      // item.style.width = popWidth;
-      // item.style.height = popHeight;
       item.style.backgroundColor = 'white';
       item.style.display = 'flex';
       item.style.justifyContent = 'center';
@@ -209,52 +141,33 @@ function DynamicList({
             opacity: 1,
           },
         ],
-        {
-          duration: 300,
-          easing: 'ease',
-          fill: 'forwards',
-        }
+        ANIMATE_OPTION
       );
 
       dimedLayer.addEventListener('click', () => {
         console.log('clicked dimed layer');
+        // TODO:
       });
 
-      // start -> final moving animation
+      // go to final position (pop out)
       item.animate(
-        [
-          // from keyframe
-          {
-            left: `${startOffsetX}px`,
-            top: `${startOffsetY}px`,
-            width: '0px', // TODO: 애니메이션 적용을 위해 수치값으로 적용 필요
-            height: '0px', // TODO: 애니메이션 적용을 위해 수치값으로 적용 필요
-            opacity: 0,
-          },
-          // to keyframe
-          {
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: popWidth,
-            height: popHeight,
-            opacity: 1,
-          },
-        ],
         {
-          duration: 300, // TODO: 통일이 필요한 값들은 상수화
-          easing: 'ease',
-          fill: 'forwards',
-        }
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: popWidth,
+          height: popHeight,
+        },
+        ANIMATE_OPTION
       );
     };
 
     return handleItemClick;
   };
 
-  wrappedItems.forEach((item, index) => {
-    const handleMouseEnter = createMouseEnterHandler(index, wrappedItems);
-    const handleMouseLeave = createMouseLeaveHandler(index, wrappedItems);
+  items.forEach((item, index) => {
+    const handleMouseEnter = createMouseEnterHandler(index, items);
+    const handleMouseLeave = createMouseLeaveHandler(index, items);
     const handleItemClick = createItemClickHandler(item, handleMouseLeave);
 
     item.addEventListener('mouseenter', handleMouseEnter);

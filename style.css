@@ -4,7 +4,7 @@
 
 .dynamic-list {
   list-style-type: none;
-  border: 1px solid black;
+  /* border: 1px solid black; */
   padding: 0;
   margin: 0;
 }
@@ -19,7 +19,7 @@
 }
 
 .dynamic-list .item.neighbor-item {
-  margin-left: 20px;
+  /* margin-left: 20px; */
 }
 
 .dynamic-list .item.selected {
