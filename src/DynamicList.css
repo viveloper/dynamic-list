@@ -1,0 +1,42 @@
+.dynamic-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dynamic-list .item {
+  border: 1px solid black;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.dynamic-list .item.hover-item {
+  margin-left: 40px;
+}
+
+.dynamic-list .item.neighbor-item {
+  margin-left: 20px;
+}
+
+.dynamic-list .item.selected {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  z-index: 1; /* TODO: 가장 높은 z-index를 설정 */
+}
+
+.dimed-layer {
+  background-color: rgba(150, 150, 150, 0.8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.dimed-layer.hidden {
+  display: none;
+}

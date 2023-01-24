@@ -5,34 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/src/DynamicList.css" />
     <title>Dynamic List</title>
-    <style>
-      .header {
-        height: 60px;
-        margin-bottom: 16px;
-      }
-      .sidebar {
-        width: 150px;
-        height: 500px;
-      }
-      .box {
-        border: 1px solid black;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      #dynamic-list-area {
-        border: 1px solid black;
-        padding: 16px;
-        max-height: 1600px;
-        min-width: 300px;
-        overflow: auto;
-      }
-    </style>
   </head>
   <body>
     <header class="header box">Header</header>
-
     <div style="display: flex; gap: 16px">
       <aside class="sidebar box">Sidebar</aside>
       <main>
@@ -40,8 +17,6 @@
       </main>
     </div>
 
-    <script src="/utils.js"></script>
-    <script src="/DynamicList.js"></script>
-    <script src="/index.js"></script>
+    <script type="module" src="/index.js"></script>
   </body>
 </html>
