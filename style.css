@@ -10,22 +10,28 @@
 }
 
 .dynamic-list .item {
-  /* border: 1px solid black; */
-  /* transition: margin-left 0.5s; */
+  border: 1px solid black;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  /* transition: margin-left 0.3s ease; */
 }
 
 .dynamic-list .item.hover-item {
-  /* margin-left: 40px; */
+  margin-left: 40px;
 }
 
 .dynamic-list .item.neighbor-item {
-  /* margin-left: 20px; */
+  margin-left: 20px;
 }
 
 .dynamic-list .item.selected {
-  /* position: fixed; */
-  /* top: 400px; */
-  /* left: 400px; */
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  z-index: 1; /* TODO: check */
 }
 
 .dimed-layer {
