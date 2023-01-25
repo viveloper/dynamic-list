@@ -127,6 +127,7 @@ const DynamicList = ({
 
     targetItem.classList.add('selected');
     targetItem.style.margin = '0px';
+    targetItem.style.justifyContent = 'center';
     targetItem.style.zIndex = getMaxZIndex() + 1;
 
     targetItem.animate(
@@ -182,6 +183,7 @@ const DynamicList = ({
       copiedTransparentItem.remove();
       dimedLayer.classList.add('hidden');
     }, ANIMATION_DURATION);
+    selectedItem.style.justifyContent = 'normal';
 
     applyHoverEffect(false);
 
