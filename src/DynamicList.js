@@ -1,7 +1,14 @@
 import { sumParentScrollOffset, getMaxZIndex } from './utils.js';
 
-// TODO: animation 적용
-// TODO: README.md 작성
+const SELECT_INDENT = 40;
+const SELECT_NEIGHBOR_INDENT = 20;
+const ANIMATION_DURATION = 300;
+const ANIMATION_OPTION = {
+  duration: ANIMATION_DURATION,
+  easing: 'ease',
+  fill: 'forwards',
+};
+
 const DynamicList = ({
   list = [],
   gap = 8,
@@ -13,25 +20,26 @@ const DynamicList = ({
 }) => {
   let selectedPosition = null;
   let hoveredPosition = null;
+  let originOffsetX = null;
+  let originOffsetY = null;
 
   const element = document.createElement('div');
-
   const dimedLayer = document.createElement('div');
-  dimedLayer.className = 'dimed-layer hidden';
-
   const ul = document.createElement('ul');
+
   ul.className = 'dynamic-list';
+  dimedLayer.className = 'dimed-layer hidden';
 
   element.appendChild(ul);
   element.appendChild(dimedLayer);
 
   const items = list.slice(0, maxItemsNumber).map((item, index) => {
     const li = document.createElement('li');
-    li.className = 'item';
+    li.className = 'dynamic-list-item';
     li.style.width = itemWidth;
     li.style.height = itemHeight;
     li.style.marginTop = `${index > 0 ? gap : 0}px`;
-    li.innerText = item;
+    li.innerText = index;
 
     return li;
   });
@@ -40,18 +48,37 @@ const DynamicList = ({
     ul.appendChild(item);
   });
 
-  const isListItem = (element) => element.classList.contains('item');
+  const isListItem = (element) =>
+    element.classList.contains('dynamic-list-item');
 
   const applyHoverEffect = (enabled) => {
-    const targetItem = items[hoveredPosition];
-    const method = enabled ? 'add' : 'remove';
-
-    targetItem.classList[method]('hover-item');
+    items[hoveredPosition].animate(
+      {
+        transform: enabled
+          ? `translate(${SELECT_INDENT}px, 0)`
+          : 'translate(0, 0)',
+      },
+      ANIMATION_OPTION
+    );
     if (hoveredPosition > 0) {
-      items[hoveredPosition - 1].classList[method]('neighbor-item');
+      items[hoveredPosition - 1].animate(
+        {
+          transform: enabled
+            ? `translate(${SELECT_NEIGHBOR_INDENT}px, 0)`
+            : 'translate(0, 0)',
+        },
+        ANIMATION_OPTION
+      );
     }
     if (hoveredPosition < items.length - 1) {
-      items[hoveredPosition + 1].classList[method]('neighbor-item');
+      items[hoveredPosition + 1].animate(
+        {
+          transform: enabled
+            ? `translate(${SELECT_NEIGHBOR_INDENT}px, 0)`
+            : 'translate(0, 0)',
+        },
+        ANIMATION_OPTION
+      );
     }
 
     if (!enabled) {
@@ -86,14 +113,12 @@ const DynamicList = ({
 
     selectedPosition = position;
 
-    // // original position for animation
-    // const OffsetLeftBeforePopout = targetItem.offsetLeft;
-    // const OffsetTopBeforePopout = targetItem.offsetTop;
-    // const [totalScrollLeft, totalScrollTop] = sumParentScrollOffset(targetItem);
-    // const originOffsetX = OffsetLeftBeforePopout - totalScrollLeft;
-    // const originOffsetY = OffsetTopBeforePopout - totalScrollTop;
-    // targetItem.style.left = `${originOffsetX}px`;
-    // targetItem.style.top = `${originOffsetY}px`;
+    // original position for animation
+    const OffsetLeftBeforePopout = targetItem.offsetLeft;
+    const OffsetTopBeforePopout = targetItem.offsetTop;
+    const [totalScrollLeft, totalScrollTop] = sumParentScrollOffset(targetItem);
+    originOffsetX = OffsetLeftBeforePopout - totalScrollLeft;
+    originOffsetY = OffsetTopBeforePopout - totalScrollTop;
 
     const copiedTransparentItem = targetItem.cloneNode(true);
     copiedTransparentItem.dataset['type'] = 'clone';
@@ -102,16 +127,39 @@ const DynamicList = ({
 
     targetItem.classList.add('selected');
     targetItem.style.margin = '0px';
-    targetItem.style.width = popWidth;
-    targetItem.style.height = popHeight;
     targetItem.style.zIndex = getMaxZIndex() + 1;
 
-    // final position
-    targetItem.style.left = '50%';
-    targetItem.style.top = '50%';
-    targetItem.style.transform = 'translate(-50%, -50%)';
+    targetItem.animate(
+      [
+        {
+          left: `${originOffsetX}px`,
+          top: `${originOffsetY}px`,
+          width: itemWidth,
+          height: itemHeight,
+        },
+        {
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: popWidth,
+          height: popHeight,
+        },
+      ],
+      ANIMATION_OPTION
+    );
 
     dimedLayer.classList.remove('hidden');
+    dimedLayer.animate(
+      [
+        {
+          opacity: 0,
+        },
+        {
+          opacity: 1,
+        },
+      ],
+      ANIMATION_OPTION
+    );
   };
 
   const handleDimedLayerClick = () => {
@@ -120,22 +168,42 @@ const DynamicList = ({
 
     selectedPosition = null;
 
-    // rollback item
-    selectedItem.classList.remove('selected');
-    selectedItem.style.margin = '';
-    selectedItem.style.marginTop = '8px';
-    selectedItem.style.width = itemWidth;
-    selectedItem.style.height = itemHeight;
-    selectedItem.style.left = '';
-    selectedItem.style.top = '';
-    selectedItem.style.transform = '';
-    selectedItem.style.zIndex = 0;
-
-    copiedTransparentItem.remove();
-
-    dimedLayer.classList.add('hidden');
+    // Restore view
+    setTimeout(() => {
+      selectedItem.classList.remove('selected');
+      selectedItem.style.margin = '';
+      selectedItem.style.marginTop = '8px';
+      selectedItem.style.width = itemWidth;
+      selectedItem.style.height = itemHeight;
+      selectedItem.style.left = '';
+      selectedItem.style.top = '';
+      selectedItem.style.transform = '';
+      selectedItem.style.zIndex = '';
+      copiedTransparentItem.remove();
+      dimedLayer.classList.add('hidden');
+    }, ANIMATION_DURATION);
 
     applyHoverEffect(false);
+
+    selectedItem.animate(
+      {
+        left: `${originOffsetX}px`,
+        top: `${originOffsetY}px`,
+        transform: 'translate(0, 0)',
+        width: itemWidth,
+        height: itemHeight,
+      },
+      ANIMATION_OPTION
+    );
+    originOffsetX = null;
+    originOffsetY = null;
+
+    dimedLayer.animate(
+      {
+        opacity: 0,
+      },
+      ANIMATION_OPTION
+    );
   };
 
   ul.addEventListener('mouseover', handleMouseOver);

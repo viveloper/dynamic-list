@@ -4,26 +4,16 @@
   margin: 0;
 }
 
-.dynamic-list .item {
+.dynamic-list-item {
   border: 1px solid black;
   padding: 4px 8px;
   display: flex;
   align-items: center;
 }
 
-.dynamic-list .item.hover-item {
-  margin-left: 40px;
-}
-
-.dynamic-list .item.neighbor-item {
-  margin-left: 20px;
-}
-
-.dynamic-list .item.selected {
+.dynamic-list-item.selected {
   position: fixed;
-  display: flex;
   justify-content: center;
-  align-items: center;
   background-color: white;
 }
 
