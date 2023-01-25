@@ -39,12 +39,7 @@ const DynamicList = ({
     li.style.width = itemWidth;
     li.style.height = itemHeight;
     li.style.marginTop = `${index > 0 ? gap : 0}px`;
-
-    const contentWrapper = document.createElement('div');
-    contentWrapper.className = 'content-wrapper';
-    contentWrapper.innerText = 'index123';
-
-    li.appendChild(contentWrapper);
+    li.innerText = index;
 
     return li;
   });
@@ -52,6 +47,9 @@ const DynamicList = ({
   items.forEach((item) => {
     ul.appendChild(item);
   });
+
+  const isListItem = (element) =>
+    element.classList.contains('dynamic-list-item');
 
   const applyHoverEffect = (enabled) => {
     items[hoveredPosition].animate(
@@ -82,12 +80,16 @@ const DynamicList = ({
         ANIMATION_OPTION
       );
     }
+
+    if (!enabled) {
+      hoveredPosition = null;
+    }
   };
 
-  const handleMouseEnter = (e) => {
+  const handleMouseOver = (e) => {
     const targetItem = e.target;
     const position = items.indexOf(targetItem);
-    if (position === selectedPosition) return;
+    if (!isListItem(targetItem) || position === selectedPosition) return;
 
     hoveredPosition = position;
     applyHoverEffect(true);
@@ -96,19 +98,18 @@ const DynamicList = ({
     console.log('hovered item position:', position);
   };
 
-  const handleMouseLeave = (e) => {
+  const handleMouseOut = (e) => {
     const targetItem = e.target;
     const position = items.indexOf(targetItem);
-    if (position === selectedPosition) return;
+    if (!isListItem(targetItem) || position === selectedPosition) return;
 
     applyHoverEffect(false);
-    hoveredPosition = position;
   };
 
   const handleItemClick = (e) => {
-    const targetItem = e.currentTarget;
+    const targetItem = e.target;
     const position = items.indexOf(targetItem);
-    if (position === selectedPosition) return;
+    if (!isListItem(targetItem) || position === selectedPosition) return;
 
     selectedPosition = position;
 
@@ -126,7 +127,6 @@ const DynamicList = ({
 
     targetItem.classList.add('selected');
     targetItem.style.margin = '0px';
-    targetItem.style.justifyContent = 'center';
     targetItem.style.zIndex = getMaxZIndex() + 1;
 
     targetItem.animate(
@@ -182,7 +182,6 @@ const DynamicList = ({
       copiedTransparentItem.remove();
       dimedLayer.classList.add('hidden');
     }, ANIMATION_DURATION);
-    selectedItem.style.justifyContent = 'normal';
 
     applyHoverEffect(false);
 
@@ -207,12 +206,9 @@ const DynamicList = ({
     );
   };
 
-  items.forEach((item) => {
-    item.addEventListener('mouseenter', handleMouseEnter);
-    item.addEventListener('mouseleave', handleMouseLeave);
-    item.addEventListener('click', handleItemClick);
-  });
-
+  ul.addEventListener('mouseover', handleMouseOver);
+  ul.addEventListener('mouseout', handleMouseOut);
+  ul.addEventListener('click', handleItemClick);
   dimedLayer.addEventListener('click', handleDimedLayerClick);
 
   return element;
