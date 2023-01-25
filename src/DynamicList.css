@@ -6,7 +6,6 @@
 
 .dynamic-list-item {
   border: 1px solid black;
-  padding: 4px 8px;
   display: flex;
   align-items: center;
 }
@@ -15,6 +14,10 @@
   position: fixed;
   justify-content: center;
   background-color: white;
+}
+
+.content-wrapper {
+  padding: 4px 8px;
 }
 
 .dimed-layer {
