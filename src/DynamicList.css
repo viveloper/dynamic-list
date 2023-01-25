@@ -25,7 +25,6 @@
   justify-content: center;
   align-items: center;
   background-color: white;
-  z-index: 1; /* TODO: 가장 높은 z-index를 설정 */
 }
 
 .dimed-layer {

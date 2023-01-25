@@ -1,11 +1,7 @@
-import { sumParentScrollOffset } from './utils.js';
+import { sumParentScrollOffset, getMaxZIndex } from './utils.js';
 
-// DynamicList Component
-
-// TODO: 'Should return the position when other item is hovered.' 의미
 // TODO: animation 적용
 // TODO: README.md 작성
-// TODO: 컴포넌트 설명
 const DynamicList = ({
   list = [],
   gap = 8,
@@ -70,6 +66,7 @@ const DynamicList = ({
     hoveredPosition = position;
     applyHoverEffect(true);
 
+    // 'Should return the position when other item is hovered.'
     console.log('hovered item position:', position);
   };
 
@@ -88,7 +85,7 @@ const DynamicList = ({
 
     selectedPosition = position;
 
-    // // original position
+    // // original position for animation
     // const OffsetLeftBeforePopout = targetItem.offsetLeft;
     // const OffsetTopBeforePopout = targetItem.offsetTop;
     // const [totalScrollLeft, totalScrollTop] = sumParentScrollOffset(targetItem);
@@ -106,6 +103,7 @@ const DynamicList = ({
     targetItem.style.margin = '0px';
     targetItem.style.width = popWidth;
     targetItem.style.height = popHeight;
+    targetItem.style.zIndex = getMaxZIndex() + 1;
 
     // final position
     targetItem.style.left = '50%';
@@ -130,6 +128,7 @@ const DynamicList = ({
     selectedItem.style.left = '';
     selectedItem.style.top = '';
     selectedItem.style.transform = '';
+    selectedItem.style.zIndex = 0;
 
     copiedTransparentItem.remove();
 
