@@ -9,6 +9,7 @@ const DynamicList = ({
   itemHeight = '',
   popWidth = '500px',
   popHeight = '360px',
+  maxItemsNumber = 100,
 }) => {
   let selectedPosition = null;
   let hoveredPosition = null;
@@ -24,7 +25,7 @@ const DynamicList = ({
   element.appendChild(ul);
   element.appendChild(dimedLayer);
 
-  const items = list.map((item, index) => {
+  const items = list.slice(0, maxItemsNumber).map((item, index) => {
     const li = document.createElement('li');
     li.className = 'item';
     li.style.width = itemWidth;
