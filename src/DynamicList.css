@@ -17,6 +17,10 @@
   background-color: white;
 }
 
+/* .content-wrapper {
+  padding: 4px 8px;
+} */
+
 .dimed-layer {
   background-color: rgba(150, 150, 150, 0.8);
   position: fixed;

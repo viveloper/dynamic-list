@@ -1,4 +1,9 @@
-import { sumParentScrollOffset, getMaxZIndex } from './utils.js';
+import {
+  sumParentScrollOffset,
+  getMaxZIndex,
+  disableScroll,
+  enableScroll,
+} from './utils.js';
 
 const SELECT_INDENT = 40;
 const SELECT_NEIGHBOR_INDENT = 20;
@@ -39,7 +44,13 @@ const DynamicList = ({
     li.style.width = itemWidth;
     li.style.height = itemHeight;
     li.style.marginTop = `${index > 0 ? gap : 0}px`;
-    li.innerText = index;
+    li.innerText = `${index}-content`;
+
+    // const contentWrapper = document.createElement('div');
+    // contentWrapper.className = 'content-wrapper';
+    // contentWrapper.innerText = `${index}-content`;
+
+    // li.appendChild(contentWrapper);
 
     return li;
   });
@@ -80,10 +91,6 @@ const DynamicList = ({
         ANIMATION_OPTION
       );
     }
-
-    if (!enabled) {
-      hoveredPosition = null;
-    }
   };
 
   const handleMouseOver = (e) => {
@@ -104,6 +111,7 @@ const DynamicList = ({
     if (!isListItem(targetItem) || position === selectedPosition) return;
 
     applyHoverEffect(false);
+    hoveredPosition = null;
   };
 
   const handleItemClick = (e) => {
@@ -161,6 +169,8 @@ const DynamicList = ({
       ],
       ANIMATION_OPTION
     );
+
+    disableScroll();
   };
 
   const handleDimedLayerClick = () => {
@@ -182,10 +192,9 @@ const DynamicList = ({
       selectedItem.style.zIndex = '';
       copiedTransparentItem.remove();
       dimedLayer.classList.add('hidden');
+      enableScroll();
     }, ANIMATION_DURATION);
     selectedItem.style.justifyContent = 'normal';
-
-    applyHoverEffect(false);
 
     selectedItem.animate(
       {
@@ -206,6 +215,9 @@ const DynamicList = ({
       },
       ANIMATION_OPTION
     );
+
+    applyHoverEffect(false);
+    hoveredPosition = null;
   };
 
   ul.addEventListener('mouseover', handleMouseOver);
