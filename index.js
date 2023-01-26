@@ -1,9 +1,9 @@
-import DynamicList from './src/DynamicList.js';
+import DynamicList from './src/components/DynamicList.js';
 
 // test data
-const SAMPLE_DATA = Array(200)
+const SAMPLE_DATA = Array(100)
   .fill('')
-  .map((_, index) => `${index + 1}`);
+  .map((_, index) => `${index + 1}-content`);
 
 // run app
 const dynamicList = DynamicList({
