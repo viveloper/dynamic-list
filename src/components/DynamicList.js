@@ -77,8 +77,8 @@ const DynamicList = ({
     ul.appendChild(item);
   });
 
-  const applyHoverEffect = (enabled) => {
-    items[hoveredPosition].animate(
+  const applyHoverEffect = (item, enabled) => {
+    item.animate(
       {
         transform: enabled
           ? `translate(${SELECT_INDENT}px, 0)`
@@ -86,30 +86,31 @@ const DynamicList = ({
       },
       ANIMATION_OPTION
     );
+  };
+
+  const applyNeighborEffect = (item, enabled) => {
+    item.animate(
+      {
+        transform: enabled
+          ? `translate(${SELECT_NEIGHBOR_INDENT}px, 0)`
+          : 'translate(0, 0)',
+      },
+      ANIMATION_OPTION
+    );
+  };
+
+  const applyHoverAndNeighborEffect = (enabled) => {
+    applyHoverEffect(items[hoveredPosition], enabled);
     if (hoveredPosition > 0) {
-      items[hoveredPosition - 1].animate(
-        {
-          transform: enabled
-            ? `translate(${SELECT_NEIGHBOR_INDENT}px, 0)`
-            : 'translate(0, 0)',
-        },
-        ANIMATION_OPTION
-      );
+      applyNeighborEffect(items[hoveredPosition - 1], enabled);
     }
     if (hoveredPosition < items.length - 1) {
-      items[hoveredPosition + 1].animate(
-        {
-          transform: enabled
-            ? `translate(${SELECT_NEIGHBOR_INDENT}px, 0)`
-            : 'translate(0, 0)',
-        },
-        ANIMATION_OPTION
-      );
+      applyNeighborEffect(items[hoveredPosition + 1], enabled);
     }
   };
 
   const handleMouseLeave = (e) => {
-    applyHoverEffect(false);
+    applyHoverAndNeighborEffect(false);
     hoveredPosition = null;
 
     e.target.removeEventListener('mouseleave', handleMouseLeave);
@@ -122,7 +123,7 @@ const DynamicList = ({
     if (position === selectedPosition || hoveredPosition !== null) return;
 
     hoveredPosition = position;
-    applyHoverEffect(true);
+    applyHoverAndNeighborEffect(true);
 
     targetItem.addEventListener('mouseleave', handleMouseLeave);
 
@@ -147,10 +148,10 @@ const DynamicList = ({
     originOffsetX = OffsetLeftBeforePopout - totalScrollLeft;
     originOffsetY = OffsetTopBeforePopout - totalScrollTop;
 
-    const copiedTransparentItem = targetItem.cloneNode(true);
-    copiedTransparentItem.dataset['type'] = 'clone';
-    copiedTransparentItem.style.opacity = 0;
-    ul.insertBefore(copiedTransparentItem, targetItem);
+    const copiedItem = targetItem.cloneNode(true);
+    copiedItem.dataset['type'] = 'clone';
+    copiedItem.style.transform = `translate(${SELECT_INDENT}px, 0)`;
+    ul.insertBefore(copiedItem, targetItem);
 
     targetItem.classList.add('selected');
     targetItem.style.margin = '0px';
@@ -208,7 +209,8 @@ const DynamicList = ({
   const handleDimedLayerClick = () => {
     if (selectedPosition === null) return;
     const selectedItem = items[selectedPosition];
-    const copiedTransparentItem = ul.querySelector('[data-type="clone"]');
+    const copiedItem = ul.querySelector('[data-type="clone"]');
+    applyHoverEffect(copiedItem, false);
 
     selectedPosition = null;
 
@@ -223,7 +225,7 @@ const DynamicList = ({
       selectedItem.style.top = '';
       selectedItem.style.transform = '';
       selectedItem.style.zIndex = '';
-      copiedTransparentItem.remove();
+      copiedItem.remove();
       dimedLayer.classList.add('hidden');
       enableScroll();
     }, ANIMATION_DURATION);
@@ -257,7 +259,7 @@ const DynamicList = ({
       ANIMATION_OPTION
     );
 
-    applyHoverEffect(false);
+    applyHoverAndNeighborEffect(false);
     hoveredPosition = null;
   };
 
