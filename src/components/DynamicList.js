@@ -126,16 +126,17 @@ const DynamicList = ({
     applyHoverAndNeighborEffect(true);
 
     targetItem.addEventListener('mouseleave', handleMouseLeave);
-
-    // 'Should return the position when other item is hovered.'
-    console.log('hovered item position:', position);
   };
 
   const handleItemClick = (e) => {
     const targetItem = e.target.closest('.dynamic-list-item');
     if (!targetItem) return;
     const position = items.indexOf(targetItem);
-    if (position === selectedPosition) return;
+    if (
+      position === selectedPosition ||
+      targetItem.classList.contains('selected')
+    )
+      return;
 
     targetItem.removeEventListener('mouseleave', handleMouseLeave);
 
