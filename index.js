@@ -1,11 +1,10 @@
 import DynamicList from './src/components/DynamicList.js';
 
-// test data
 const SAMPLE_DATA = Array(100)
   .fill('')
   .map((_, index) => `${index + 1}-content`);
 
-// run app
+// Run
 const dynamicList = DynamicList({
   list: SAMPLE_DATA,
   itemWidth: '200px',
