@@ -6,7 +6,6 @@
 
 .dynamic-list-item {
   border: 1px solid black;
-  padding: 4px 8px;
   display: flex;
   align-items: center;
 }
@@ -17,9 +16,9 @@
   background-color: white;
 }
 
-/* .content-wrapper {
+.content-wrapper {
   padding: 4px 8px;
-} */
+}
 
 .dimed-layer {
   background-color: rgba(150, 150, 150, 0.8);

@@ -44,13 +44,12 @@ const DynamicList = ({
     li.style.width = itemWidth;
     li.style.height = itemHeight;
     li.style.marginTop = `${index > 0 ? gap : 0}px`;
-    li.innerText = `${index}-content`;
 
-    // const contentWrapper = document.createElement('div');
-    // contentWrapper.className = 'content-wrapper';
-    // contentWrapper.innerText = `${index}-content`;
+    const contentWrapper = document.createElement('div');
+    contentWrapper.className = 'content-wrapper';
+    contentWrapper.innerText = `${index}-content`;
 
-    // li.appendChild(contentWrapper);
+    li.appendChild(contentWrapper);
 
     return li;
   });
@@ -58,9 +57,6 @@ const DynamicList = ({
   items.forEach((item) => {
     ul.appendChild(item);
   });
-
-  const isListItem = (element) =>
-    element.classList.contains('dynamic-list-item');
 
   const applyHoverEffect = (enabled) => {
     items[hoveredPosition].animate(
@@ -93,31 +89,35 @@ const DynamicList = ({
     }
   };
 
+  const handleMouseLeave = (e) => {
+    applyHoverEffect(false);
+    hoveredPosition = null;
+
+    e.target.removeEventListener('mouseleave', handleMouseLeave);
+  };
+
   const handleMouseOver = (e) => {
-    const targetItem = e.target;
+    const targetItem = e.target.closest('.dynamic-list-item');
+    if (!targetItem) return;
     const position = items.indexOf(targetItem);
-    if (!isListItem(targetItem) || position === selectedPosition) return;
+    if (position === selectedPosition || hoveredPosition !== null) return;
 
     hoveredPosition = position;
     applyHoverEffect(true);
+
+    targetItem.addEventListener('mouseleave', handleMouseLeave);
 
     // 'Should return the position when other item is hovered.'
     console.log('hovered item position:', position);
   };
 
-  const handleMouseOut = (e) => {
-    const targetItem = e.target;
-    const position = items.indexOf(targetItem);
-    if (!isListItem(targetItem) || position === selectedPosition) return;
-
-    applyHoverEffect(false);
-    hoveredPosition = null;
-  };
-
   const handleItemClick = (e) => {
-    const targetItem = e.target;
+    const targetItem = e.target.closest('.dynamic-list-item');
+    if (!targetItem) return;
     const position = items.indexOf(targetItem);
-    if (!isListItem(targetItem) || position === selectedPosition) return;
+    if (position === selectedPosition) return;
+
+    targetItem.removeEventListener('mouseleave', handleMouseLeave);
 
     selectedPosition = position;
 
@@ -137,7 +137,6 @@ const DynamicList = ({
     targetItem.style.margin = '0px';
     targetItem.style.justifyContent = 'center';
     targetItem.style.zIndex = getMaxZIndex() + 1;
-
     targetItem.animate(
       [
         {
@@ -156,7 +155,6 @@ const DynamicList = ({
       ],
       ANIMATION_OPTION
     );
-
     dimedLayer.classList.remove('hidden');
     dimedLayer.animate(
       [
@@ -169,7 +167,6 @@ const DynamicList = ({
       ],
       ANIMATION_OPTION
     );
-
     disableScroll();
   };
 
@@ -179,7 +176,7 @@ const DynamicList = ({
 
     selectedPosition = null;
 
-    // Restore view
+    // Restore list view
     setTimeout(() => {
       selectedItem.classList.remove('selected');
       selectedItem.style.margin = '';
@@ -221,7 +218,6 @@ const DynamicList = ({
   };
 
   ul.addEventListener('mouseover', handleMouseOver);
-  ul.addEventListener('mouseout', handleMouseOut);
   ul.addEventListener('click', handleItemClick);
   dimedLayer.addEventListener('click', handleDimedLayerClick);
 
